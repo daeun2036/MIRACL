@@ -31,6 +31,9 @@ char *ecy="07192B95FFC8DA78631011ED6B24CDD573F977A11E794811";
 
 char *text="MIRACL - Best multi-precision library in the World!\n";
 
+//  TODO: big : 엄청큰변수 , mirvar : big 변수 선언, cotnum : 출력,    mip->IOBASE=16; 16진수 지정
+// TODO: cinstr : big에 문자열 삽입
+
 int main()
 {
     int ia,ib;
@@ -113,7 +116,7 @@ int main()
 
     printf("\nLets try that again using elliptic curves .... \n");
     convert(-3,a);
-    mip->IOBASE=16;
+    mip->IOBASE=16; //16 진수로 지정 만약 10이면 10진수로 받아옴 안적으면 큰일남
     cinstr(b,ecb);
     cinstr(p,ecp);      
     ecurve_init(a,b,p,MR_BEST);  /* Use PROJECTIVE if possible, else AFFINE coordinates */
@@ -142,7 +145,7 @@ int main()
     epoint_set(pb,pb,ib,eb); /* decompress eb */
     ecurve_mult(a,eb,eb);
     epoint_get(eb,key,key);
-    cotnum(key,stdout);
+    cotnum(key,stdout); //출력
 
     printf("Bob calculates Key=\n");
     epoint_set(pa,pa,ia,ea); /* decompress ea */
