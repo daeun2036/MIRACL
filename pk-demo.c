@@ -73,7 +73,7 @@ int main()
     k=mirvar(0);
     inv=mirvar(0);
 
-    time(&seed);
+    time(&seed); // 1980년 1월 1일 0시(UTC)부터 지금까지의 초단위 시간
     irand((unsigned long)seed);   /* change parameter for different values */
 
     printf("First Diffie-Hellman Key exchange .... \n");
@@ -89,14 +89,14 @@ int main()
 
 /* 3 generates the sub-group of prime order (p-1)/2 */
 
-    powltr(3,a,p,pa);
+    powltr(3,a,p,pa); // pa = 3 * a (mod p)
 
     printf("Bob's offline calculation\n");        
     bigbits(160,b);
     powltr(3,b,p,pb);
 
     printf("Alice calculates Key=\n");
-    powmod(pb,a,p,key);
+    powmod(pb,a,p,key); // same as powltr (pb = big)
     cotnum(key,stdout);
 
     printf("Bob calculates Key=\n");
@@ -106,6 +106,7 @@ int main()
     printf("Alice and Bob's keys should be the same!\n");
 
 /* 
+    대수곡선
    Now Elliptic Curve version of the above.
    Curve is y^2=x^3+Ax+B mod p, where A=-3, B and p as above 
    "Primitive root" is the point (x,y) above, which is of large prime order q. 
@@ -114,93 +115,103 @@ int main()
  
 */
 
-    printf("\nLets try that again using elliptic curves .... \n");
-    convert(-3,a);
-    mip->IOBASE=16; //16 진수로 지정 만약 10이면 10진수로 받아옴 안적으면 큰일남
-    cinstr(b,ecb);
-    cinstr(p,ecp);      
-    ecurve_init(a,b,p,MR_BEST);  /* Use PROJECTIVE if possible, else AFFINE coordinates */
+    // printf("\nLets try that again using elliptic curves .... \n");
+    // convert(-3,a);
+    // mip->IOBASE=16; //16 진수로 지정 만약 10이면 10진수로 받아옴 안적으면 큰일남
+    // cinstr(b,ecb);
+    // cinstr(p,ecp);      
+    // ecurve_init(a,b,p,MR_BEST);  /* Use PROJECTIVE if possible, else AFFINE coordinates */
+    // // y2 = x3 + Ax + B(mod p) 타원곡선형태
+    // // a = A 타원곡선 계수 / b = B타원곡선 계수
+    // // p = modular
+    // // MR_BEST = type
 
-    g=epoint_init();
-    cinstr(x,ecx);
-    cinstr(y,ecy);
-    mip->IOBASE=10;
-    epoint_set(x,y,0,g);
-    ea=epoint_init();
-    eb=epoint_init();
-    epoint_copy(g,ea);
-    epoint_copy(g,eb);
+    // g=epoint_init(); // GF(p)타원곡선의 한 점에 메모리 저장 / 'point at infinity'로 초기화
+    // cinstr(x,ecx);
+    // cinstr(y,ecy);
+    // mip->IOBASE=10;
+    // epoint_set(x,y,0,g);
+    // // 현재 활성 GF(p) 타원곡선에 point 설정
+    // // 
+    // ea=epoint_init();
+    // eb=epoint_init();
+    // epoint_copy(g,ea);
+    // epoint_copy(g,eb);
 
-    printf("Alice's offline calculation\n");        
-    bigbits(160,a);
-    ecurve_mult(a,ea,ea);
-    ia=epoint_get(ea,pa,pa); /* <ia,pa> is compressed form of public key */
+    // printf("Alice's offline calculation\n");        
+    // bigbits(160,a);
+    // ecurve_mult(a,ea,ea);
+    // ia=epoint_get(ea,pa,pa); /* <ia,pa> is compressed form of public key */
 
-    printf("Bob's offline calculation\n");        
-    bigbits(160,b);
-    ecurve_mult(b,eb,eb);
-    ib=epoint_get(eb,pb,pb); /* <ib,pb> is compressed form of public key */
+    // printf("Bob's offline calculation\n");        
+    // bigbits(160,b);
+    // ecurve_mult(b,eb,eb);
+    // ib=epoint_get(eb,pb,pb); /* <ib,pb> is compressed form of public key */
 
-    printf("Alice calculates Key=\n");
-    epoint_set(pb,pb,ib,eb); /* decompress eb */
-    ecurve_mult(a,eb,eb);
-    epoint_get(eb,key,key);
-    cotnum(key,stdout); //출력
+    // printf("Alice calculates Key=\n");
+    // epoint_set(pb,pb,ib,eb); /* decompress eb */
+    // ecurve_mult(a,eb,eb);
+    // epoint_get(eb,key,key);
+    // cotnum(key,stdout); //출력
 
-    printf("Bob calculates Key=\n");
-    epoint_set(pa,pa,ia,ea); /* decompress ea */
-    ecurve_mult(b,ea,ea);
-    epoint_get(ea,key,key);
-    cotnum(key,stdout);
+    // printf("Bob calculates Key=\n");
+    // epoint_set(pa,pa,ia,ea); /* decompress ea */
+    // ecurve_mult(b,ea,ea);
+    // epoint_get(ea,key,key);
+    // cotnum(key,stdout);
 
-    printf("Alice and Bob's keys should be the same! (but much smaller)\n");
+    // printf("Alice and Bob's keys should be the same! (but much smaller)\n");
 
-    epoint_free(g);
-    epoint_free(ea);
-    epoint_free(eb);
+    // epoint_free(g); // free memory
+    // epoint_free(ea);
+    // epoint_free(eb);
 
-/* El Gamal's Method */
 
-    printf("\nTesting El Gamal's public key method\n");
-    cinstr(p,primetext);
-    bigbits(160,x);    /* x<p */
-    powltr(3,x,p,y);    /* y=3^x mod p*/
-    decr(p,1,p1);
+    /* El Gamal's Method */
+    // printf("\nTesting El Gamal's public key method\n");
+    // cinstr(p,primetext);
+    // bigbits(160,x);    /* x<p */
+    // powltr(3,x,p,y);    /* y=3^x mod p*/
+    // decr(p,1,p1);
 
-    mip->IOBASE=128;
-    cinstr(m,text);
+    // mip->IOBASE=128;
+    // cinstr(m,text);
 
-    mip->IOBASE=10;
-    do 
-    {
-        bigbits(160,k);
-    } while (egcd(k,p1,t)!=1);
-    powltr(3,k,p,a);   /* a=3^k mod p */
-    powmod(y,k,p,b);
-    mad(b,m,m,p,p,b);  /* b=m*y^k mod p */
-    printf("Ciphertext= \n");
-    cotnum(a,stdout);
-    cotnum(b,stdout);
+    // mip->IOBASE=10;
+    // do 
+    // {
+    //     bigbits(160,k);
+    // } while (egcd(k,p1,t)!=1);
+    // powltr(3,k,p,a);   /* a=3^k mod p */
+    // powmod(y,k,p,b);
+    // mad(b,m,m,p,p,b);  /* b=m*y^k mod p */
+    // printf("Ciphertext= \n");
+    // cotnum(a,stdout);
+    // cotnum(b,stdout);
 
-    zero(m);           /* proof of pudding... */
+    // zero(m);           /* proof of pudding... */
   
-    subtract(p1,x,t);
-    powmod(a,t,p,m);
-    mad(m,b,b,p,p,m);  /* m=b/a^x mod p */
+    // subtract(p1,x,t);
+    // powmod(a,t,p,m);
+    // mad(m,b,b,p,p,m);  /* m=b/a^x mod p */
 
-    printf("Plaintext= \n");
-    mip->IOBASE=128;
-    cotnum(m,stdout);
-    mip->IOBASE=10;
+    // printf("Plaintext= \n");
+    // mip->IOBASE=128;
+    // cotnum(m,stdout);
+    // mip->IOBASE=10;
 
 /* RSA. Generate primes p & q. Use e=65537, and find d=1/e mod (p-1)(q-1) */
 
+    // key 생성
     printf("\nNow generating 512-bit random primes p and q\n");
     do 
     {
-        bigbits(512,p);
-        if (subdivisible(p,2)) incr(p,1,p);
-        while (!isprime(p)) incr(p,2,p);
+        // p and q => prime number(소수)
+        bigbits(512,p); // generate a big random number of 512bits
+        if (subdivisible(p,2)) // bool subdivisible ( test p for divisibility by 2)
+            incr(p,1,p); // maybe icrease ( p = p+1)
+        while (!isprime(p))  
+            incr(p,2,p);
 
         bigbits(512,q);
         if (subdivisible(q,2)) incr(q,1,q);
@@ -208,11 +219,19 @@ int main()
 
         multiply(p,q,n);      /* n=p.q */
 
-        lgconv(65537L,e);
-        decr(p,1,p1);
+        lgconv(65537L,e); // convert long to big
+        decr(p,1,p1); // maybe decrease (p1 = p-1)
         decr(q,1,q1);
         multiply(p1,q1,phi);  /* phi =(p-1)*(q-1) */
-    } while (xgcd(e,phi,d,d,t)!=1);
+    } while (xgcd(e,phi,d,d,t)!=1);  // modular inverse
+
+    /*
+        xgcd(x,y,xd,yd,z)
+        z = gcd(x,y) = (x*xd) + (y*yd)
+        // gcd 유클리드 호제법 - 최대공약수
+        ex)
+        xgcd(x,p,x,x,x); // x = 1/x mod p(p is prime)
+    */
 
     cotnum(p,stdout);
     cotnum(q,stdout);
@@ -226,6 +245,7 @@ int main()
 */
 
 /* use simple CRT as only two primes */
+// Chinese Remainder Theorem
 
     xgcd(p,q,inv,inv,inv);   /* 1/p mod q */
 
@@ -261,4 +281,3 @@ int main()
 /*    crt_end(&ch);  */
     return 0;
 }
-
